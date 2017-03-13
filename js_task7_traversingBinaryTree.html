@@ -4,16 +4,39 @@
         <meta charset="utf-8" />
         <title>Traversing binary tree</title>
         <style type="text/css">
-        #contect {
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #content {
             width: 800px;
             margin: 0 auto;
+        }
+
+        #buttons {
+            width: 600px;
+            margin: 0 auto;
+        }
+
+        #buttons input {
+            outline: none;
+            border: 0;
+            width: 197px;
+            height: 30px;
         }
         </style>
     </head>
     <body>
         <div id="content">
-            <canvas id="screen" width="800" height="500"></canvas>
-            <button id="ldr">LDR</button>
+            <div>
+                <canvas id="screen" width="800" height="500"></canvas>
+            </div>
+            <div id="buttons">
+                <input type="button" id="dlr" value="Preorder traversal" />
+                <input type="button" id="ldr" value="Inorder traversal" />
+                <input type="button" id="lrd" value="Postorder traversal" />
+            </div>
         </div>
     </body>
     <script type="text/javascript">
@@ -132,20 +155,10 @@
             IFE.BinaryTree._doDraw(IFE.BinaryTree.root);
         },
 
-        _doLDR: function (_node, _elements) {
-            if (_node) {
-                IFE.BinaryTree._doLDR(_node.left, _elements);
-
-                _elements[_elements.length] = _node;
-
-                IFE.BinaryTree._doLDR(_node.right, _elements);
-            }
-        },
-
         animation: function (_elements, _i) {
             if (_i >= _elements.length) {
                 // Enable the button.
-                IFE.BinaryTree.ldrButton.disabled = false;
+                IFE.BinaryTree.enableButtons();
                 // Move next color.
                 IFE.BinaryTree.currentColor = (IFE.BinaryTree.currentColor + 1) % IFE.BinaryTree.colors.length;
 
@@ -160,14 +173,76 @@
             }, 1000);
         },
 
+        _doDLR: function (_node, _elements) {
+            if (_node) {
+                _elements[_elements.length] = _node;
+
+                IFE.BinaryTree._doDLR(_node.left, _elements);
+
+                IFE.BinaryTree._doDLR(_node.right, _elements);
+            }
+        },
+
+        dlr: function () {
+            var elements = new Array();
+            // Disable the button.
+            IFE.BinaryTree.disableButtons();
+
+            IFE.BinaryTree._doDLR(IFE.BinaryTree.root, elements);
+
+            IFE.BinaryTree.animation(elements, 0);
+        },
+
+        _doLDR: function (_node, _elements) {
+            if (_node) {
+                IFE.BinaryTree._doLDR(_node.left, _elements);
+
+                _elements[_elements.length] = _node;
+
+                IFE.BinaryTree._doLDR(_node.right, _elements);
+            }
+        },
+
         ldr: function () {
             var elements = new Array();
             // Disable the button.
-            IFE.BinaryTree.ldrButton.disabled = true;
+            IFE.BinaryTree.disableButtons();
 
             IFE.BinaryTree._doLDR(IFE.BinaryTree.root, elements);
 
             IFE.BinaryTree.animation(elements, 0);
+        },
+
+        _doLRD: function (_node, _elements) {
+            if (_node) {
+                IFE.BinaryTree._doLRD(_node.left, _elements);
+
+                IFE.BinaryTree._doLRD(_node.right, _elements);
+
+                _elements[_elements.length] = _node;
+            }
+        },
+
+        lrd: function () {
+            var elements = new Array();
+            // Disable the button.
+            IFE.BinaryTree.disableButtons();
+
+            IFE.BinaryTree._doLRD(IFE.BinaryTree.root, elements);
+
+            IFE.BinaryTree.animation(elements, 0);
+        },
+
+        disableButtons: function () {
+            IFE.BinaryTree.dlrButton.disabled = true;
+            IFE.BinaryTree.ldrButton.disabled = true;
+            IFE.BinaryTree.lrdButton.disabled = true;
+        },
+
+        enableButtons: function () {
+            IFE.BinaryTree.dlrButton.disabled = false;
+            IFE.BinaryTree.ldrButton.disabled = false;
+            IFE.BinaryTree.lrdButton.disabled = false;
         },
 
         init: function() {
@@ -182,13 +257,22 @@
 
             IFE.BinaryTree.currentColor = 0;
             IFE.BinaryTree.root = null;
+
             IFE.BinaryTree.context = document.getElementById("screen").getContext("2d");
+
+            IFE.BinaryTree.dlrButton = document.getElementById("dlr");
             IFE.BinaryTree.ldrButton = document.getElementById("ldr");
+            IFE.BinaryTree.lrdButton = document.getElementById("lrd");
+
             //IFE.BinaryTree.context.strokeStyle = "red";
             //IFE.BinaryTree.context.strokeRect(0, 0, 800, 800);
+
             IFE.BinaryTree.buildTree([8, 6, 11, 2, 7, 10, 12, 1, 3, 9, 16]);
             IFE.BinaryTree.draw();
+
+            IFE.BinaryTree.dlrButton.onclick = IFE.BinaryTree.dlr;
             IFE.BinaryTree.ldrButton.onclick = IFE.BinaryTree.ldr;
+            IFE.BinaryTree.lrdButton.onclick = IFE.BinaryTree.lrd;
         },
 
         colors: ["yellow", "green", "blue", "orange", "silver", "gray"],
