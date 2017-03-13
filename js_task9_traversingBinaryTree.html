@@ -119,10 +119,15 @@
 
         animation: function (_elements, _i) {
             if (_i >= _elements.length) {
+                // Enable the button.
+                IFE.BinaryTree.ldrButton.disabled = false;
+                // Move next color.
+                IFE.BinaryTree.currentColor = (IFE.BinaryTree.currentColor + 1) % IFE.BinaryTree.colors.length;
+
                 return;
             }
 
-            _elements[_i].drawNode("yellow");
+            _elements[_i].drawNode(IFE.BinaryTree.color());
 
             // Traversing next node after 1s.
             setTimeout(function () {
@@ -132,6 +137,8 @@
 
         ldr: function () {
             var elements = new Array();
+            // Disable the button.
+            IFE.BinaryTree.ldrButton.disabled = true;
 
             IFE.BinaryTree._doLDR(IFE.BinaryTree.root, elements);
 
@@ -139,13 +146,23 @@
         },
 
         init: function() {
+            IFE.BinaryTree.currentColor = 0;
             IFE.BinaryTree.root = null;
             IFE.BinaryTree.context = document.getElementById("screen").getContext("2d");
+            IFE.BinaryTree.ldrButton = document.getElementById("ldr");
             //IFE.BinaryTree.context.strokeStyle = "red";
             //IFE.BinaryTree.context.strokeRect(0, 0, 800, 800);
             IFE.BinaryTree.buildTree([1, 5, 3, 2 ,7, 9]);
             IFE.BinaryTree.draw();
-            document.getElementById("ldr").onclick = IFE.BinaryTree.ldr;
+            IFE.BinaryTree.ldrButton.onclick = IFE.BinaryTree.ldr;
+        },
+
+        colors: ["yellow", "green", "blue", "orange", "silver", "gray"],
+
+        color: function () {
+            var color = IFE.BinaryTree.colors[IFE.BinaryTree.currentColor];
+
+            return color;
         }
     };
 
