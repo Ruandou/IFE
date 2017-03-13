@@ -37,6 +37,9 @@
         };
 
         this.drawNode = function (_color, _valueColor) {
+            var dx = this.value >= 10 ? 10 : 5;
+            var dy = 5;
+
             this.context.beginPath();
             this.context.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
             this.context.fillStyle = _color || this.color // blue
@@ -45,7 +48,7 @@
 
             this.context.font = "bold 20px consolas";
             this.context.fillStyle = _valueColor || "red";
-            this.context.fillText(this.value, this.x - 5, this.y + 5);
+            this.context.fillText(this.value, this.x - dx, this.y + dy);
         };
 
         this.draw = function () {
@@ -62,19 +65,41 @@
     };
 
     IFE.BinaryTree = {
+        len: 80,
+
+        nextPos: function (_x, _y) {
+            var i, j = _y / IFE.BinaryTree.len;
+            for (i = _x / IFE.BinaryTree.len; i < 10; i++) {
+                if (IFE.BinaryTree.boxes[i][j] == false) {
+                    break;
+                }
+            }
+
+            IFE.BinaryTree.boxes[i][j] = true;
+
+            return {x: i * IFE.BinaryTree.len,
+                    y: j * IFE.BinaryTree.len};
+        },
+
         _doInsert: function (_node, _number) {
+            var position;
+
             if (_node.value >= _number)
             {
                 if (_node.left == null) {
-                    _node.left = new IFE.Node(_node.x - 80, _node.y + 80, _number, IFE.BinaryTree.context);
+                    position = IFE.BinaryTree.nextPos(_node.x - IFE.BinaryTree.len, _node.y + IFE.BinaryTree.len);
+
+                    _node.left = new IFE.Node(position.x, position.y, _number, IFE.BinaryTree.context);
                 } else {
-                    IFE.BinaryTree._doInsert(_node.left, _number, _node.x - 80, _node.y + 80);
+                    IFE.BinaryTree._doInsert(_node.left, _number);
                 }
             } else {
                 if (_node.right == null) {
-                    _node.right = new IFE.Node(_node.x + 80, _node.y + 80, _number, IFE.BinaryTree.context);
+                    position = IFE.BinaryTree.nextPos(_node.x + IFE.BinaryTree.len, _node.y + IFE.BinaryTree.len);
+
+                    _node.right = new IFE.Node(position.x, position.y, _number, IFE.BinaryTree.context);
                 } else {
-                    IFE.BinaryTree._doInsert(_node.right, _number, _node.x + 80, _node.y + 80);
+                    IFE.BinaryTree._doInsert(_node.right, _number);
                 }
             }
         },
@@ -146,13 +171,22 @@
         },
 
         init: function() {
+            IFE.BinaryTree.boxes = new Array(10);
+
+            for (var i = 0; i < 10; i++) {
+                IFE.BinaryTree.boxes[i] = new Array(10);
+                for (var j = 0; j < 10; j++) {
+                    IFE.BinaryTree.boxes[i][j] = false;
+                }
+            }
+
             IFE.BinaryTree.currentColor = 0;
             IFE.BinaryTree.root = null;
             IFE.BinaryTree.context = document.getElementById("screen").getContext("2d");
             IFE.BinaryTree.ldrButton = document.getElementById("ldr");
             //IFE.BinaryTree.context.strokeStyle = "red";
             //IFE.BinaryTree.context.strokeRect(0, 0, 800, 800);
-            IFE.BinaryTree.buildTree([1, 5, 3, 2 ,7, 9]);
+            IFE.BinaryTree.buildTree([8, 6, 11, 2, 7, 10, 12, 1, 3, 9, 16]);
             IFE.BinaryTree.draw();
             IFE.BinaryTree.ldrButton.onclick = IFE.BinaryTree.ldr;
         },
