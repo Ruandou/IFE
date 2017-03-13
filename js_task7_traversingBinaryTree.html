@@ -110,16 +110,12 @@
             if (_node.value >= _number)
             {
                 if (_node.left == null) {
-                    // position = IFE.BinaryTree.nextPos(_node.x - IFE.BinaryTree.len, _node.y + IFE.BinaryTree.len);
-
                     _node.left = new IFE.Node(_node.x - _dx, _node.y + _dy, _number, IFE.BinaryTree.context);
                 } else {
                     IFE.BinaryTree._doInsert(_node.left, _number, _dx / 2, _dy);
                 }
             } else {
                 if (_node.right == null) {
-                    // position = IFE.BinaryTree.nextPos(_node.x + IFE.BinaryTree.len, _node.y + IFE.BinaryTree.len);
-
                     _node.right = new IFE.Node(_node.x + _dx, _node.y + _dy, _number, IFE.BinaryTree.context);
                 } else {
                     IFE.BinaryTree._doInsert(_node.right, _number, _dx / 2, _dy);
