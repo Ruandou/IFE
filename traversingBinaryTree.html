@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Traversing binary tree</title>
+        <style type="text/css">
+        #contect {
+            width: 800px;
+            margin: 0 auto;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+            <canvas id="screen" width="800" height="500"></canvas>
+            <button id="ldr">LDR</button>
+        </div>
+    </body>
+    <script type="text/javascript">
+    var IFE = {};
+
+    IFE.Node = function (_x, _y, _value, _context) {
+        this.x = _x;
+        this.y = _y;
+        this.value = _value;
+        this.context = _context;
+        this.r = 20;
+        this.color = "rgb(0, 255, 0)"; // blue
+        this.left = null;
+        this.right = null;
+
+        this._lineTo = function (_x, _y) {
+            this.context.strokeStyle = this.color;
+            this.context.moveTo(this.x, this.y);
+            this.context.lineTo(_x, _y);
+            this.context.stroke();
+        };
+
+        this.drawNode = function (_color, _valueColor) {
+            this.context.beginPath();
+            this.context.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+            this.context.fillStyle = _color || this.color // blue
+            this.context.fill();
+            this.context.closePath();
+
+            this.context.font = "bold 20px consolas";
+            this.context.fillStyle = _valueColor || "red";
+            this.context.fillText(this.value, this.x - 5, this.y + 5);
+        };
+
+        this.draw = function () {
+            this.drawNode();            
+
+            if (this.left) {
+                this._lineTo(this.left.x, this.left.y);
+            }
+
+            if (this.right) {
+                this._lineTo(this.right.x, this.right.y);
+            }
+        };
+    };
+
+    IFE.BinaryTree = {
+        _doInsert: function (_node, _number) {
+            if (_node.value >= _number)
+            {
+                if (_node.left == null) {
+                    _node.left = new IFE.Node(_node.x - 80, _node.y + 80, _number, IFE.BinaryTree.context);
+                } else {
+                    IFE.BinaryTree._doInsert(_node.left, _number, _node.x - 80, _node.y + 80);
+                }
+            } else {
+                if (_node.right == null) {
+                    _node.right = new IFE.Node(_node.x + 80, _node.y + 80, _number, IFE.BinaryTree.context);
+                } else {
+                    IFE.BinaryTree._doInsert(_node.right, _number, _node.x + 80, _node.y + 80);
+                }
+            }
+        },
+
+        insert: function (_number) {
+            if (IFE.BinaryTree.root == null)
+            {
+                IFE.BinaryTree.root = new IFE.Node(400, 80, _number, IFE.BinaryTree.context);
+            } else {
+                IFE.BinaryTree._doInsert(IFE.BinaryTree.root, _number);
+            }
+        },
+
+        buildTree: function (_numbers) {
+            var i;
+            for (i = 0; i < _numbers.length; i++) {
+                IFE.BinaryTree.insert(_numbers[i]);
+            }
+        },
+
+        _doDraw: function (_node) {
+            if (_node) {
+                _node.draw();
+                IFE.BinaryTree._doDraw(_node.left);
+                IFE.BinaryTree._doDraw(_node.right);
+            }
+        },
+
+        draw: function () {
+            IFE.BinaryTree._doDraw(IFE.BinaryTree.root);
+        },
+
+        _doLDR: function (_node, _elements) {
+            if (_node) {
+                IFE.BinaryTree._doLDR(_node.left, _elements);
+
+                _elements[_elements.length] = _node;
+
+                IFE.BinaryTree._doLDR(_node.right, _elements);
+            }
+        },
+
+        animation: function (_elements, _i) {
+            if (_i >= _elements.length) {
+                return;
+            }
+
+            _elements[_i].drawNode("yellow");
+
+            // Traversing next node after 1s.
+            setTimeout(function () {
+                IFE.BinaryTree.animation(_elements, _i + 1);
+            }, 1000);
+        },
+
+        ldr: function () {
+            var elements = new Array();
+
+            IFE.BinaryTree._doLDR(IFE.BinaryTree.root, elements);
+
+            IFE.BinaryTree.animation(elements, 0);
+        },
+
+        init: function() {
+            IFE.BinaryTree.root = null;
+            IFE.BinaryTree.context = document.getElementById("screen").getContext("2d");
+            //IFE.BinaryTree.context.strokeStyle = "red";
+            //IFE.BinaryTree.context.strokeRect(0, 0, 800, 800);
+            IFE.BinaryTree.buildTree([1, 5, 3, 2 ,7, 9]);
+            IFE.BinaryTree.draw();
+            document.getElementById("ldr").onclick = IFE.BinaryTree.ldr;
+        }
+    };
+
+    IFE.BinaryTree.init();
+    </script>
+</html>
